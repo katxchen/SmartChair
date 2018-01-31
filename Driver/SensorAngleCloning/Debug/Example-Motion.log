@@ -1,4 +1,5 @@
 ﻿  Example-Motion.cpp
-  Example-Motion.vcxproj -> C:\Users\URANi\Dropbox\02_StudyAbroad\21-25_Fall_Promotion\24_2017Fall\03_Research\171129_FallCoding\examples\4a-Example-Motion\Debug\Example-Motion.exe
+d:\documents\github\smartchair\driver\sensoranglecloning\example-motion.cpp(163): warning C4101: 'duration': unreferenced local variable
+  Example-Motion.vcxproj -> D:\Documents\GitHub\SmartChair\Driver\SensorAngleCloning\Debug\Example-Motion.exe
   C:\Program Files (x86)\Teknic\ClearView\sdk\lib\win\Release\Win32\MNuserDriver20.dll
   1 File(s) copied

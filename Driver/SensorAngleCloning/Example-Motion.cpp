@@ -5,14 +5,19 @@
 //*****************************************************************************
 
 //Required include files
-#include <stdio.h>	
+#include "stdio.h"
 #include <string>
+#include "string.h"
 #include "pubSysCls.h"	
 
 //----------------------------------------------
 #include "SerialPort.h"
 #include <iostream>
-#include <stdlib.h>
+#include "stdlib.h"
+
+#include <ctime>
+#include <time.h>
+
 
 using namespace sFnd;
 using std::cout;
@@ -20,7 +25,7 @@ using std::endl;
 
 /*Portname must contain these backslashes, and remember to
 replace the following com port*/
-char *port_name = "\\\\.\\COM11";
+char *port_name = "\\\\.\\COM7";
 
 //String for incoming data
 char incomingData[MAX_DATA_LENGTH];
@@ -32,7 +37,7 @@ int incomingFigure;
 //sequential repeated moves on each axis.
 //*********************************************************************************
 
-#define PORT_NUM			10	//The port's COM number (as seen in device manager)
+#define PORT_NUM			4	//The port's COM number (as seen in device manager)
 #define ACC_LIM_RPM_PER_SEC	100000
 #define VEL_LIM_RPM			700
 //#define MOVE_DISTANCE_CNTS	40	
@@ -155,7 +160,14 @@ int main(int argc, char* argv[])
 	//At this point we will execute 10 rev moves sequentially on each axis
 	//////////////////////////////////////////////////////////////////////////////////////
 
+	double duration;
 
+
+	//int n = 500;
+	std::vector<double> comm, time;
+	int pos = 0;
+	//plt::ion();
+	clock_t start_time = clock();
 	try {
 		for (size_t i = 0; i < NUM_MOVES; i++)
 		{
@@ -169,59 +181,83 @@ int main(int argc, char* argv[])
 
 				//Check if data has been read or not
 				int read_result = arduino.readSerialPort(incomingData, MAX_DATA_LENGTH);
-				//int current_angle2 = theNode.Motion.PosnMeasured;
-				//prints out data
-				//puts(incomingData);
-				//std::string test(incomingData);
-				//printf("Read Result \t%i \n", incomingData);
-				//Sleep(10);
+				std::string res(incomingData);
+				int begin = res.find_first_of(".");
+				int end = res.find_first_of(",", begin + 1);
+				if (begin != -1 && end != -1) {
+					res = res.substr(begin + 1, end - 1);
+					//std::cout << "Res: " << res << std::endl;
+					long command = atoi(res.c_str())/500;
+					double com = command / 10000.0;
+					double time_diff = (double)(clock() - start_time) / CLOCKS_PER_SEC;
+					start_time = clock();
+					printf("command: %f\t\t res: %s\t\t Read: %s\t\t time: %f\n", com, res.c_str(), incomingData, time_diff);
+					//comm.push_back(com);
+					//duration = (std::clock() - start) / (double)CLOCKS_PER_SEC;
+					//time.push_back(duration);
+					//pos++;
+					/*if (pos > MAX_PLOT_ENTRIES) {
+						//plt::clf();
+						//cout << "deleting" << endl;
+						comm.erase(comm.begin());
+						time.erase(time.begin());
+					}*/
+					//plt::plot(time, comm, "r");
+					//plt::show();
+					//plt::pause(0.000001);
+					//int current_angle2 = theNode.Motion.PosnMeasured;
+					//prints out data
+					//puts(incomingData);
+					//std::string test(incomingData);
+					//printf("Read Result \t%i \n", incomingData);
+					//Sleep(10);
 
-				//print
-				//printf("Read Result \t%i %d\n", read_result, );
-				//std::cout << "current angle " << current_angle << std::endl;
-				//std::cout << "current angle2 " << current_angle2 << std::endl;
-				std::cout << "Return code: " << read_result << std::endl;
-				std::cout << "Read Result " << incomingData << std::endl;
-				int command = atoi(incomingData) * 50;
-				int safetyValue = 1000;
+					//print
+					//printf("Read Result \t%i %d\n", read_result, );
+					//std::cout << "current angle " << current_angle << std::endl;
+					//std::cout << "current angle2 " << current_angle2 << std::endl;
+					//std::cout << "Return code: " << read_result << std::endl;
+					//std::cout << "Read Result " << incomingData << std::endl;
+					//int command = atoi(incomingData) * 50;
+					int safetyValue = 1000;
 
-				if (command > safetyValue)
-				{
-					std::cout << "Command " << command << " is too big" << std::endl;
-					command = safetyValue;
-				}
-				else if (command < -safetyValue)
-				{
-					std::cout << "Command " << command << " is too small" << std::endl;
-					command = -safetyValue;
-				} 
-				std::cout << "Casted command value: " << command << std::endl;
-
-
-				theNode.Motion.MoveWentDone();						//Clear the rising edge Move done register
-
-				theNode.AccUnit(INode::RPM_PER_SEC);				//Set the units for Acceleration to RPM/SEC
-				theNode.VelUnit(INode::RPM);						//Set the units for Velocity to RPM
-				theNode.Motion.AccLimit = ACC_LIM_RPM_PER_SEC;		//Set Acceleration Limit (RPM/Sec)
-				theNode.Motion.VelLimit = VEL_LIM_RPM;				//Set Velocity Limit (RPM)
-
-				printf("Moving Node \t%i \n", iNode);
-				
-				theNode.Motion.MovePosnStart(command, true);			//Execute angle encoder count move 
-
-				double timeout = myMgr.TimeStampMsec() + theNode.Motion.MovePosnDurationMsec(command) + 50;			//define a timeout in case the node is unable to enable
-																		
-
-				while (!theNode.Motion.MoveWentDone()) {
-					if (myMgr.TimeStampMsec() > timeout) {
-						printf("Error: Timed out waiting for move to complete\n");
-						return -2;
+					if (command > safetyValue)
+					{
+						std::cout << "Command " << command << " is too big" << std::endl;
+						command = safetyValue;
 					}
-				}
-				printf("Node \t%i Move Done\n", iNode);
+					else if (command < -safetyValue)
+					{
+						std::cout << "Command " << command << " is too small" << std::endl;
+						command = -safetyValue;
+					}
+					std::cout << "Casted command value: " << command << std::endl;
 
+
+					theNode.Motion.MoveWentDone();						//Clear the rising edge Move done register
+
+					theNode.AccUnit(INode::RPM_PER_SEC);				//Set the units for Acceleration to RPM/SEC
+					theNode.VelUnit(INode::RPM);						//Set the units for Velocity to RPM
+					theNode.Motion.AccLimit = ACC_LIM_RPM_PER_SEC;		//Set Acceleration Limit (RPM/Sec)
+					theNode.Motion.VelLimit = VEL_LIM_RPM;				//Set Velocity Limit (RPM)
+
+					printf("Moving Node \t%i \n", iNode);
+
+					theNode.Motion.MovePosnStart(command, true);			//Execute angle encoder count move 
+
+					double timeout = myMgr.TimeStampMsec() + theNode.Motion.MovePosnDurationMsec(command) + 50;			//define a timeout in case the node is unable to enable
+
+
+					while (!theNode.Motion.MoveWentDone()) {
+						if (myMgr.TimeStampMsec() > timeout) {
+							printf("Error: Timed out waiting for move to complete\n");
+							return -2;
+						}
+					}
+					printf("Node \t%i Move Done\n", iNode);
+				}
 			}
-		myMgr.Delay(100);
+		//myMgr.Delay(5);
 		}
 	}
 		catch (mnErr theErr)
@@ -265,4 +301,3 @@ int main(int argc, char* argv[])
 	::system("pause"); //pause so the user can see the program output; waits for user to press a key
 	return 0;			//End program
 }
-
