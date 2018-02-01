@@ -1,8 +1,3 @@
-#include <Adafruit_BNO055.h>
-
-#define ALPHA 0.9
-#define NUM_SAMPLES 5
-
 //#define BAUD 9600
 //
 //void setup(){
@@ -15,22 +10,29 @@
 //}
 
 #include <Wire.h>
+#include <Adafruit_Sensor.h>
+#include <Adafruit_BNO055.h>
+#include <utility/imumaths.h>
 
 /* This driver uses the Adafruit unified sensor library (Adafruit_Sensor),
    which provides a common 'type' for sensor data and some helper functions.
+
    To use this driver you will also need to download the Adafruit_Sensor
    library and include it in your libraries folder.
+
    You should also assign a unique ID to this sensor for use with
    the Adafruit Sensor API so that you can identify this particular
    sensor in any data logs, etc.  To assign a unique ID, simply
    provide an appropriate value in the constructor below (12345
    is used by default in this example).
+
    Connections
    ===========
    Connect SCL to analog 5
    Connect SDA to analog 4
    Connect VDD to 3-5V DC
    Connect GROUND to common ground
+
    History
    =======
    2015/MAR/03  - First release (KTOWN)
@@ -38,7 +40,7 @@
 */
 
 /* Set the delay between fresh samples */
-#define BNO055_SAMPLERATE_DELAY_MS 4
+#define BNO055_SAMPLERATE_DELAY_MS (100)
 
 Adafruit_BNO055 bno = Adafruit_BNO055(55);
 
@@ -49,11 +51,6 @@ Adafruit_BNO055 bno = Adafruit_BNO055(55);
 int ledPin = 13;
 int state= 0;
 
-double filtY = 0.0;
-
-double samples[NUM_SAMPLES];
-double sum = 0.0;
-int sampIdx = 0;
 /**************************************************************************/
 /*
     Displays some basic information on this sensor from the unified
@@ -140,7 +137,7 @@ void displayCalStatus(void)
 void setup(void)
 {
   pinMode(ledPin, OUTPUT); // pin will be used to for output
-  Serial.begin(115200);
+  Serial.begin(9600);
   //Serial.println("Orientation Sensor Test"); Serial.println("");
 
   /* Initialise the sensor */
@@ -171,9 +168,8 @@ void setup(void)
 void loop(void)
 {
   /* Get a new sensor event */
-  //sensors_event_t event;
-  //bno.getEvent(&event);
-  imu::Vector<3> acc = bno.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
+  sensors_event_t event;
+  bno.getEvent(&event);
 
 //  /* Display the floating point data */
 //  Serial.print("X: ");
@@ -182,20 +178,7 @@ void loop(void)
 //  Serial.print(event.orientation.y, 4);
 //  Serial.print("\tZ: ");
 //  Serial.print(event.orientation.z, 4);
-    double raw = acc.y();
-    double MAFY = MAF(raw);
-    filtY = lowPass(raw);
-    Serial.print(".");
-    Serial.print((long)(10000*filtY));
-    Serial.print(",");
-    
-    //Serial.print(acc.x());
-    //Serial.print(", ");
-    //Serial.print(acc.y());
-    //Serial.print(", ");
-    //Serial.println(acc.z());
-
-  //Serial.println(x);
+  Serial.println(event.orientation.z, 4);
 
   /* Optional: Display calibration status */
   //displayCalStatus();
@@ -204,23 +187,8 @@ void loop(void)
   //displaySensorStatus();
 
   /* New line for the next sample */
+  Serial.println("");
 
   /* Wait the specified delay before requesting nex data */
   delay(BNO055_SAMPLERATE_DELAY_MS);
 }
-
-double lowPass(double val){
-  return ALPHA*val + (1.0 - ALPHA)*filtY;
-}
-
-double MAF(double val){
-  sum -= samples[sampIdx];
-  samples[sampIdx] = val;
-  sum += val;
-  sampIdx++;
-  if(sampIdx >= NUM_SAMPLES){
-    sampIdx = 0;
-  }
-  return (sum / (double)NUM_SAMPLES);
-}
-
