@@ -13,16 +13,12 @@
 //----------------------------------------------
 #include "SerialPort.h"
 #include <iostream>
-#include <fstream>
-#include <iomanip>
-
 #include "stdlib.h"
 
 #include <ctime>
 #include <time.h>
 
 
-using namespace std;
 using namespace sFnd;
 using std::cout;
 using std::endl;
@@ -35,15 +31,13 @@ char *port_name = "\\\\.\\COM7";
 char incomingData[MAX_DATA_LENGTH];
 int incomingFigure;
 
-char* filename1 = "D:\\test1.csv";
-
 
 //*********************************************************************************
 //This program will load configuration files onto each node connected to the port, then executes
 //sequential repeated moves on each axis.
 //*********************************************************************************
 
-#define PORT_NUM			5	//The port's COM number (as seen in device manager)
+#define PORT_NUM			4	//The port's COM number (as seen in device manager)
 #define ACC_LIM_RPM_PER_SEC	100000
 #define VEL_LIM_RPM			700
 //#define MOVE_DISTANCE_CNTS	40	
@@ -54,9 +48,6 @@ int main(int argc, char* argv[])
 	SerialPort arduino(port_name);
 	if (arduino.isConnected()) cout << "Arduino Connection Established" << endl;
 	else cout << "ERROR, check Arduino port name";
-
-	ofstream fp;
-	fp.open(filename1);
 
 	//These represent to locations of any and all config files to be loaded into the motors.  Uncomment line 96 to load configs.
 	std::string CONFIG_FILES[] = { "C:\\filepath\\Axis0.mtr",
@@ -177,7 +168,6 @@ int main(int argc, char* argv[])
 	int pos = 0;
 	//plt::ion();
 	clock_t start_time = clock();
-	clock_t overall_start_time = clock();
 	try {
 		for (size_t i = 0; i < NUM_MOVES; i++)
 		{
@@ -197,16 +187,13 @@ int main(int argc, char* argv[])
 				if (begin != -1 && end != -1) {
 					res = res.substr(begin + 1, end - 1);
 					//std::cout << "Res: " << res << std::endl;
-					long command = atoi(res.c_str())/200;
+					long command = atoi(res.c_str())/500;
 					double com = command / 10000.0;
 					double time_diff = (double)(clock() - start_time) / CLOCKS_PER_SEC;
 					start_time = clock();
 					printf("command: %f\t\t res: %s\t\t Read: %s\t\t time: %f\n", com, res.c_str(), incomingData, time_diff);
 					//comm.push_back(com);
-					
-					duration = (std::clock() - overall_start_time) / (double)CLOCKS_PER_SEC;
-
-					fp << duration << "," << com << "," << command << endl;
+					//duration = (std::clock() - start) / (double)CLOCKS_PER_SEC;
 					//time.push_back(duration);
 					//pos++;
 					/*if (pos > MAX_PLOT_ENTRIES) {
@@ -258,7 +245,7 @@ int main(int argc, char* argv[])
 
 					theNode.Motion.MovePosnStart(command, true);			//Execute angle encoder count move 
 
-					double timeout = myMgr.TimeStampMsec() + theNode.Motion.MovePosnDurationMsec(command) + 120;			//define a timeout in case the node is unable to enable
+					double timeout = myMgr.TimeStampMsec() + theNode.Motion.MovePosnDurationMsec(command) + 50;			//define a timeout in case the node is unable to enable
 
 
 					while (!theNode.Motion.MoveWentDone()) {
@@ -267,7 +254,6 @@ int main(int argc, char* argv[])
 							return -2;
 						}
 					}
-
 					printf("Node \t%i Move Done\n", iNode);
 				}
 			}
