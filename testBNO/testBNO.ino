@@ -1,6 +1,6 @@
 #include <Adafruit_BNO055.h>
 
-#define ALPHA 0.9
+#define ALPHA 0.29
 #define NUM_SAMPLES 5
 
 //#define BAUD 9600
@@ -15,6 +15,7 @@
 //}
 
 #include <Wire.h>
+#include "math.h"
 
 /* This driver uses the Adafruit unified sensor library (Adafruit_Sensor),
    which provides a common 'type' for sensor data and some helper functions.
@@ -50,6 +51,7 @@ int ledPin = 13;
 int state= 0;
 
 double filtY = 0.0;
+imu::Vector<3> LPAccels = imu::Vector<3>(0.0,0.0,0.0);
 
 double samples[NUM_SAMPLES];
 double sum = 0.0;
@@ -182,13 +184,22 @@ void loop(void)
 //  Serial.print(event.orientation.y, 4);
 //  Serial.print("\tZ: ");
 //  Serial.print(event.orientation.z, 4);
-    double raw = acc.y();
-    double MAFY = MAF(raw);
-    filtY = lowPass(raw);
-    Serial.print(".");
-    Serial.print((long)(10000*filtY));
+    //double raw = acc.y();
+    //double MAFY = MAF(raw);
+    double angOrig = atan2(acc.y(),acc.z());
+    updateLowPass(acc);
+    double ang = atan2(LPAccels.y(),LPAccels.z());
+    ang *= (double)(57296 / 1000);
+    angOrig *= (double)(57296 / 1000);
+  
+    //Serial.print(".");
+    //Serial.print((long)(10000*ang));
+    //Serial.print(",");
+    //Serial.print(LPAccels.z());
+    //Serial.print(",");
+    Serial.print(ang);
     Serial.print(",");
-    
+    Serial.println(angOrig);
     //Serial.print(acc.x());
     //Serial.print(", ");
     //Serial.print(acc.y());
@@ -209,8 +220,9 @@ void loop(void)
   delay(BNO055_SAMPLERATE_DELAY_MS);
 }
 
-double lowPass(double val){
-  return ALPHA*val + (1.0 - ALPHA)*filtY;
+void updateLowPass(imu::Vector<3> vals){
+  LPAccels = imu::Vector<3>(ALPHA*vals.x() + (1.0 - ALPHA)*LPAccels.x()
+    ,ALPHA*vals.y() + (1.0 - ALPHA)*LPAccels.y(),ALPHA*vals.z() + (1.0 - ALPHA)*LPAccels.z());
 }
 
 double MAF(double val){

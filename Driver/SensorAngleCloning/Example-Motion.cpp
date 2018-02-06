@@ -21,7 +21,6 @@
 #include <ctime>
 #include <time.h>
 
-
 using namespace std;
 using namespace sFnd;
 using std::cout;
@@ -43,9 +42,9 @@ char* filename1 = "D:\\test1.csv";
 //sequential repeated moves on each axis.
 //*********************************************************************************
 
-#define PORT_NUM			5	//The port's COM number (as seen in device manager)
-#define ACC_LIM_RPM_PER_SEC	100000
-#define VEL_LIM_RPM			700
+#define PORT_NUM			4	//The port's COM number (as seen in device manager)
+#define ACC_LIM_RPM_PER_SEC	250000
+#define VEL_LIM_RPM			1800
 //#define MOVE_DISTANCE_CNTS	40	
 #define NUM_MOVES			10000
 
@@ -178,6 +177,10 @@ int main(int argc, char* argv[])
 	//plt::ion();
 	clock_t start_time = clock();
 	clock_t overall_start_time = clock();
+	myPort.Nodes(0).AccUnit(INode::RPM_PER_SEC);				//Set the units for Acceleration to RPM/SEC
+	myPort.Nodes(0).VelUnit(INode::RPM);						//Set the units for Velocity to RPM
+	myPort.Nodes(0).Motion.AccLimit = ACC_LIM_RPM_PER_SEC;		//Set Acceleration Limit (RPM/Sec)
+	myPort.Nodes(0).Motion.VelLimit = VEL_LIM_RPM;				//Set Velocity Limit (RPM)
 	try {
 		for (size_t i = 0; i < NUM_MOVES; i++)
 		{
@@ -201,7 +204,8 @@ int main(int argc, char* argv[])
 					double com = command / 10000.0;
 					double time_diff = (double)(clock() - start_time) / CLOCKS_PER_SEC;
 					start_time = clock();
-					printf("command: %f\t\t res: %s\t\t Read: %s\t\t time: %f\n", com, res.c_str(), incomingData, time_diff);
+					//printf("command: %f\t\t res: %s\t\t Read: %s\t\t time: %f\n", com, res.c_str(), incomingData, time_diff);
+					
 					//comm.push_back(com);
 					
 					duration = (std::clock() - overall_start_time) / (double)CLOCKS_PER_SEC;
@@ -244,21 +248,23 @@ int main(int argc, char* argv[])
 						std::cout << "Command " << command << " is too small" << std::endl;
 						command = -safetyValue;
 					}
-					std::cout << "Casted command value: " << command << std::endl;
+					//std::cout << "Casted command value: " << command << std::endl;
 
 
 					theNode.Motion.MoveWentDone();						//Clear the rising edge Move done register
 
-					theNode.AccUnit(INode::RPM_PER_SEC);				//Set the units for Acceleration to RPM/SEC
-					theNode.VelUnit(INode::RPM);						//Set the units for Velocity to RPM
-					theNode.Motion.AccLimit = ACC_LIM_RPM_PER_SEC;		//Set Acceleration Limit (RPM/Sec)
-					theNode.Motion.VelLimit = VEL_LIM_RPM;				//Set Velocity Limit (RPM)
+					//printf("Clearing buffered moves and stopping motion");
+					theNode.Motion.NodeStop(STOP_TYPE_DISABLE_ABRUPT);
+					theNode.Motion.NodeStopClear();
 
-					printf("Moving Node \t%i \n", iNode);
+					//printf("Moving Node \t%i \n", iNode);
 
 					theNode.Motion.MovePosnStart(command, true);			//Execute angle encoder count move 
 
-					double timeout = myMgr.TimeStampMsec() + theNode.Motion.MovePosnDurationMsec(command) + 120;			//define a timeout in case the node is unable to enable
+					theNode.Motion.PosnMeasured.Refresh();
+					theNode.Motion.PosnCommanded.Refresh();
+					printf("com: %d\t\t pos: %f\t\t command: %f\t\t time: %f\n", command, theNode.Motion.PosnMeasured.Value(), theNode.Motion.PosnCommanded.Value(), time_diff);
+					/*double timeout = myMgr.TimeStampMsec() + theNode.Motion.MovePosnDurationMsec(command) + 120;			//define a timeout in case the node is unable to enable
 
 
 					while (!theNode.Motion.MoveWentDone()) {
@@ -266,12 +272,13 @@ int main(int argc, char* argv[])
 							printf("Error: Timed out waiting for move to complete\n");
 							return -2;
 						}
-					}
+					}*/
 
-					printf("Node \t%i Move Done\n", iNode);
+					//printf("Node \t%i Move Done\n", iNode);
+					
 				}
 			}
-		//myMgr.Delay(5);
+		myMgr.Delay(5);
 		}
 	}
 		catch (mnErr theErr)
