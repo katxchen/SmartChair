@@ -204,16 +204,31 @@ int main(int argc, char* argv[])
 
 
 				//Check if data has been read or not
+				long angle;
 				clearInc();
 				int read_result = arduino.readSerialPort(incomingData, MAX_DATA_LENGTH);
 				std::string res(incomingData);
-				int begin = res.find_first_of(".");
+				//cout << "res: " << res << endl;
+				int begin = res.find_last_of(".");
 				int end = res.find_first_of(",", begin + 1);
+				if (end == -1) {
+					res = res.substr(0, begin);
+				}
+				begin = res.find_last_of(".");
+				end = res.find_first_of(" ", begin + 1);
 				if (begin != -1 && end != -1) {
 					res = res.substr(begin + 1, end - 1);
 					//std::cout << "Res: " << res << std::endl;
-					long command = atoi(res.c_str())/200;
-					double com = command / 10000.0;
+					angle = atoi(res.c_str());
+				}
+				else {
+					angle = LONG_MIN;
+				}
+				if (angle != LONG_MIN) {
+					double realAng = (double)angle / 10000.0;
+					//std::cout << "Res: " << res << std::endl;
+					double command = -realAng / 0.0037;
+					double com = realAng;
 					double time_diff = (double)(clock() - start_time) / CLOCKS_PER_SEC;
 					start_time = clock();
 					//printf("command: %f\t\t res: %s\t\t Read: %s\t\t time: %f\n", com, res.c_str(), incomingData, time_diff);
@@ -248,7 +263,7 @@ int main(int argc, char* argv[])
 					//std::cout << "Return code: " << read_result << std::endl;
 					//std::cout << "Read Result " << incomingData << std::endl;
 					//int command = atoi(incomingData) * 50;
-					int safetyValue = 1000;
+					int safetyValue = 2500;
 
 					if (command > safetyValue)
 					{

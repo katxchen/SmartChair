@@ -1,0 +1,5 @@
+﻿  Example-Motion.cpp
+d:\documents\github\smartchair\testtilt\sensoranglecloning\example-motion.cpp(289): warning C4244: 'argument': conversion from 'double' to 'int32_t', possible loss of data
+  Example-Motion.vcxproj -> D:\Documents\GitHub\SmartChair\TestTilt\SensorAngleCloning\Debug\Example-Motion.exe
+  C:\Program Files (x86)\Teknic\ClearView\sdk\lib\win\Release\Win32\MNuserDriver20.dll
+  1 File(s) copied
