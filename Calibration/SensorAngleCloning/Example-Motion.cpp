@@ -73,6 +73,7 @@ void clearInc() {
 	}
 }
 
+//don't use this yet, it crashes the program and doesn't give any error
 int zeroPosition(INode& theNode, SysManager myMgr) {
 	theNode.Motion.MoveWentDone();						//Clear the rising edge Move done register		
 	theNode.Motion.MovePosnStart(0, true);
@@ -88,6 +89,7 @@ int zeroPosition(INode& theNode, SysManager myMgr) {
 	return 0;
 }
 
+//don't use this yet, it gives the same value over and over
 long getArduinoData(SerialPort arduino) {
 	int read_result = arduino.readSerialPort(incomingData, MAX_DATA_LENGTH);
 	std::string res(incomingData);

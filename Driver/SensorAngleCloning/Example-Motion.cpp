@@ -48,6 +48,12 @@ char* filename1 = "D:\\test1.csv";
 //#define MOVE_DISTANCE_CNTS	40	
 #define NUM_MOVES			10000
 
+void clearInc() {
+	for (int i = 0; i < MAX_DATA_LENGTH; i++) {
+		incomingData[i] = 0;
+	}
+}
+
 int main(int argc, char* argv[])
 {
 	SerialPort arduino(port_name);
@@ -181,20 +187,9 @@ int main(int argc, char* argv[])
 	myPort.Nodes(0).VelUnit(INode::RPM);						//Set the units for Velocity to RPM
 	myPort.Nodes(0).Motion.AccLimit = ACC_LIM_RPM_PER_SEC;		//Set Acceleration Limit (RPM/Sec)
 	myPort.Nodes(0).Motion.VelLimit = VEL_LIM_RPM;				//Set Velocity Limit (RPM)
+	clearInc();
 	int read_result = arduino.readSerialPort(incomingData, MAX_DATA_LENGTH);
 	std::string res(incomingData);
-	std::cout << "res: " << res << endl;
-	myMgr.Delay(500);
-	read_result = arduino.readSerialPort(incomingData, MAX_DATA_LENGTH);
-	res = (incomingData);
-	std::cout << "res: " << res << endl;
-	myMgr.Delay(500);
-	read_result = arduino.readSerialPort(incomingData, MAX_DATA_LENGTH);
-	res = (incomingData);
-	std::cout << "res: " << res << endl;
-	myMgr.Delay(500);
-	read_result = arduino.readSerialPort(incomingData, MAX_DATA_LENGTH);
-	res = (incomingData);
 	std::cout << "res: " << res << endl;
 	myMgr.Delay(500);
 	try {
@@ -209,6 +204,7 @@ int main(int argc, char* argv[])
 
 
 				//Check if data has been read or not
+				clearInc();
 				int read_result = arduino.readSerialPort(incomingData, MAX_DATA_LENGTH);
 				std::string res(incomingData);
 				int begin = res.find_first_of(".");
