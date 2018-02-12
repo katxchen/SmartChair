@@ -181,6 +181,22 @@ int main(int argc, char* argv[])
 	myPort.Nodes(0).VelUnit(INode::RPM);						//Set the units for Velocity to RPM
 	myPort.Nodes(0).Motion.AccLimit = ACC_LIM_RPM_PER_SEC;		//Set Acceleration Limit (RPM/Sec)
 	myPort.Nodes(0).Motion.VelLimit = VEL_LIM_RPM;				//Set Velocity Limit (RPM)
+	int read_result = arduino.readSerialPort(incomingData, MAX_DATA_LENGTH);
+	std::string res(incomingData);
+	std::cout << "res: " << res << endl;
+	myMgr.Delay(500);
+	read_result = arduino.readSerialPort(incomingData, MAX_DATA_LENGTH);
+	res = (incomingData);
+	std::cout << "res: " << res << endl;
+	myMgr.Delay(500);
+	read_result = arduino.readSerialPort(incomingData, MAX_DATA_LENGTH);
+	res = (incomingData);
+	std::cout << "res: " << res << endl;
+	myMgr.Delay(500);
+	read_result = arduino.readSerialPort(incomingData, MAX_DATA_LENGTH);
+	res = (incomingData);
+	std::cout << "res: " << res << endl;
+	myMgr.Delay(500);
 	try {
 		for (size_t i = 0; i < NUM_MOVES; i++)
 		{
