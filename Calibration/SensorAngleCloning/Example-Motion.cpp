@@ -41,6 +41,7 @@ char* filename1 = "D:\\test1.csv";
 
 double intercept = 0.0;
 double slope = 0.0;
+#define ORDER 2
 
 
 //*********************************************************************************
@@ -66,6 +67,7 @@ double slope = 0.0;
 #define ACC_ANG_MODE '0'
 #define GRAV_ANG_MODE '1'
 #define ORIENTATION_MODE '2'
+
 
 void clearInc() {
 	for (int i = 0; i < MAX_DATA_LENGTH; i++) {
@@ -113,7 +115,23 @@ double getRealAng(long angle) {
 	return ((double)angle / ANGLE_DIVISOR);
 }
 
-double linReg(vector<double>& x,vector<double>& y) {
+void printVec(vector<double>& x, int len) {
+	for (int i = 0; i <= ORDER; i++) {
+		cout << x.at(i) << ", ";
+	}
+	cout << endl;
+}
+
+double learningRates[ORDER + 1] = { 0.001,0.00001,0.0000002};
+
+void printVec(vector<double>& x, int len) {
+	for (int i = 0; i <= ORDER; i++) {
+		cout << x.at(i) << ", ";
+	}
+	cout << endl;
+}
+
+void linReg(vector<double>& x, vector<double>& y) {
 	if (x.size() != y.size()) {
 		throw exception("...");
 	}
@@ -137,6 +155,92 @@ double linReg(vector<double>& x,vector<double>& y) {
 	slope = numerator / denominator;
 	intercept = avgY - (slope*avgX);
 }
+
+double calcGradContrib(int order, int coeffNum, vector<double>& currCoeffs, double x, double y, int N) {
+	double val = 0;
+	for (int i = 0; i <= order; i++) {
+		val += currCoeffs.at(i) * pow(x, i);
+	}
+	val = y - val;
+	val = -pow(x, coeffNum)*val;
+	val = val * 2.0 / N;
+	return val;
+}
+
+double vectorMag(int order, vector<double>& x) {
+	double mag = 0.0;
+	for (int i = 0; i < order; i++) {
+		mag += pow(x.at(i), 2.0);
+	}
+	return mag;
+}
+
+double getError(int order, vector<double>& x, vector<double>& y, vector<double>& coeffs, int N) {
+	double err = 0.0;
+	for (int i = 0; i < N; i++) {
+		double prediction = 0.0;
+		for (int j = 0; j <= order; j++) {
+			prediction += coeffs.at(j) * pow(x.at(i), j);
+		}
+		err += pow(y.at(i) - prediction, 2.0);
+	}
+	return err;
+}
+
+double stepGradient(int order, vector<double>& x, vector<double>& y, vector<double>& coeffs, int N, double* learningRate) {
+	double initialError = getError(order, x, y, coeffs, N);
+	vector<double> grad(order + 1);
+	for (int j = 0; j <= order; j++) {
+		double contrib = 0.0;
+		for (int i = 0; i < N; i++) {
+			contrib += calcGradContrib(order, j, coeffs, x.at(i), y.at(i), N);
+		}
+		grad.at(j) = contrib;
+	}
+	//printVec(coeffs, ORDER + 1);
+	double gradMag = vectorMag(order + 1, grad);
+	for (int i = 0; i <= order; i++) {
+		coeffs.at(i) = coeffs.at(i) - (learningRate[i] * grad.at(i));
+	}
+	double newError = getError(order, x, y, coeffs, N);
+	return initialError - newError;
+}
+
+double getRSquared(double squaredError, vector<double>& y, int N) {
+	double avgY = std::accumulate(y.begin(), y.end(), 0.0) / N;
+	double totalError = 0.0;
+	for (int i = 0; i < N; i++) {
+		totalError += pow(y.at(i) - avgY, 2.0);
+	}
+	return (1 - (squaredError / totalError));
+}
+
+int reg(int order, vector<double>& x, vector<double>& y, vector<double>& coeffs, double* learningRates) {
+	linReg(x, y);
+	if (x.size() != y.size()) {
+		throw exception("...");
+	}
+	double n = x.size();
+	coeffs.push_back(intercept);
+	coeffs.push_back(slope);
+	if (order == 1) {
+		return 0;
+	}
+	for (int i = 0; i <= order; i++) {
+		coeffs.push_back(0.0);
+	}
+	double error = 9999.9;
+	double squaredErr = getError(order, x, y, coeffs, n);
+	double rSquared = getRSquared(squaredErr, y, n);
+	while (abs(error) > 0.0001) {
+		error = stepGradient(order, x, y, coeffs, n, learningRates);
+		squaredErr = getError(order, x, y, coeffs, n);
+		rSquared = getRSquared(squaredErr, y, n);
+		cout << "Error: " << error << ", r-squared: " << rSquared << endl;
+	}
+	return 0;
+}
+	
 
 int main(int argc, char* argv[])
 {
@@ -437,6 +541,10 @@ int main(int argc, char* argv[])
 		printf("Calibration Finished!\nCalculating Linear Regression...\n");
 		linReg(pos, val);
 		printf("The formula for the regression line is:\nAngle = %f * position + %f\n", slope, intercept);
+		vector<double> coefficients;
+		reg(ORDER, pos, val, coefficients, 0.000005);
+		printf("The formula for the degree %d regression equation is:\nAngle = %f * x^2 + %f * x + %f\n"
+			, ORDER, coefficients.at(2), coefficients.at(1), coefficients.at(0));
 		fp.close();
 	}
 		catch (mnErr theErr)
