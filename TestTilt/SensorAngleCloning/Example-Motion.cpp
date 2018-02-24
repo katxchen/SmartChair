@@ -44,7 +44,7 @@ char* filename1 = "D:\\test1.csv";
 
 #define PORT_NUM			4	//The port's COM number (as seen in device manager)
 #define ACC_LIM_RPM_PER_SEC	420000
-#define VEL_LIM_RPM			3800
+#define VEL_LIM_RPM			4000
 //#define MOVE_DISTANCE_CNTS	40	
 #define NUM_MOVES			10000
 

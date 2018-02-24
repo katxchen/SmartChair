@@ -1,4 +1,6 @@
 ﻿  Example-Motion.cpp
+d:\documents\github\smartchair\driver\sensoranglecloning\example-motion.cpp(289): warning C4244: 'argument': conversion from 'double' to 'int32_t', possible loss of data
+d:\documents\github\smartchair\driver\sensoranglecloning\example-motion.cpp(293): warning C4477: 'printf' : format string '%d' requires an argument of type 'int', but variadic argument 1 has type 'double'
   Example-Motion.vcxproj -> D:\Documents\GitHub\SmartChair\Driver\SensorAngleCloning\Debug\Example-Motion.exe
   C:\Program Files (x86)\Teknic\ClearView\sdk\lib\win\Release\Win32\MNuserDriver20.dll
   1 File(s) copied

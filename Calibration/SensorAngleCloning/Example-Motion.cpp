@@ -122,14 +122,7 @@ void printVec(vector<double>& x, int len) {
 	cout << endl;
 }
 
-double learningRates[ORDER + 1] = { 0.001,0.00001,0.0000002};
-
-void printVec(vector<double>& x, int len) {
-	for (int i = 0; i <= ORDER; i++) {
-		cout << x.at(i) << ", ";
-	}
-	cout << endl;
-}
+double learningRates[ORDER + 1] = { 0.00000000001,0.0000000000001,0.000000000000002};
 
 void linReg(vector<double>& x, vector<double>& y) {
 	if (x.size() != y.size()) {
@@ -446,6 +439,7 @@ int main(int argc, char* argv[])
 		vector<double> pos;
 		vector<double> val;
 		printf("Calibrating motion...\n");
+		bool right = true;
 		for (int i = 0; i < NUM_CAL_ITER; i++) {
 			bool goingToCenter = false;
 			bool calibrated = false;
@@ -478,6 +472,7 @@ int main(int argc, char* argv[])
 					theNode.Motion.MoveWentDone();
 					std::cout << "Reached Max Value, moving other direction" << std::endl;
 					theNode.Motion.MoveVelStart(-CAL_VEL);
+					right = !right;
 				}
 				else if (currPos < -SAFETY_VALUE)
 				{
@@ -486,6 +481,7 @@ int main(int argc, char* argv[])
 					theNode.Motion.MoveWentDone();						//Clear the rising edge Move done register		
 					theNode.Motion.MoveVelStart(CAL_VEL);
 					goingToCenter = true;
+					right = !right;
 				}
 				if (goingToCenter) {
 					theNode.Motion.PosnMeasured.Refresh();
@@ -530,8 +526,15 @@ int main(int argc, char* argv[])
 				if (angle != LONG_MIN) {
 					double realAng = getRealAng(angle);
 					theNode.Motion.PosnMeasured.Refresh();
-					fp << theNode.Motion.PosnMeasured.Value() << "," << realAng << endl;
-					cout << theNode.Motion.PosnMeasured.Value() << "," << realAng << endl;
+					theNode.Motion.VelCommanded.Refresh();
+
+					if (abs(CAL_VEL - theNode.Motion.VelCommanded.Value()) <= 10.0) {
+						fp << theNode.Motion.PosnMeasured.Value() << "," << realAng << "," << "0" << endl;
+					}
+					else {
+						fp << theNode.Motion.PosnMeasured.Value() << "," << "0" << "," << realAng << endl;
+					}
+					cout << theNode.Motion.PosnMeasured.Value() << "," << realAng << "," << theNode.Motion.VelCommanded.Value() << endl;
 					pos.push_back(theNode.Motion.PosnMeasured.Value());
 					val.push_back(realAng);
 				}
@@ -542,9 +545,9 @@ int main(int argc, char* argv[])
 		linReg(pos, val);
 		printf("The formula for the regression line is:\nAngle = %f * position + %f\n", slope, intercept);
 		vector<double> coefficients;
-		reg(ORDER, pos, val, coefficients, 0.000005);
-		printf("The formula for the degree %d regression equation is:\nAngle = %f * x^2 + %f * x + %f\n"
-			, ORDER, coefficients.at(2), coefficients.at(1), coefficients.at(0));
+		//reg(ORDER, pos, val, coefficients, learningRates);
+		//printf("The formula for the degree %d regression equation is:\nAngle = %f * x^2 + %f * x + %f\n"
+		//	, ORDER, coefficients.at(2), coefficients.at(1), coefficients.at(0));
 		fp.close();
 	}
 		catch (mnErr theErr)

@@ -51,7 +51,7 @@ int sampIdx = 0;
 #define ACC_ANG_MODE 0
 #define GRAV_ANG_MODE 1
 #define ORIENTATION_MODE 2
-char mode = 1;
+char mode = 0;
 
 /**************************************************************************/
 /*
