@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<segmentData xmlns='http://www.solidworks.com/segmentData'>
+    <segment ID='1'>
+        <properties>
+            <Name value='CPoint1@Cable_1-Main Assembly-001.SLDASM:JP1@Cable_1-Main Assembly-001'/>
+            <FromCompID value='0'/>
+            <ToCompID value='0'/>
+            <FromConnectionPoint value=''/>
+            <ToConnectionPoint value=''/>
+            <FromComponentRef value=''/>
+            <ToComponentRef value='JP1'/>
+            <Length value='0.038100'/>
+            <AdditionalLength value='0.038100'/>
+            <FromLocation value='-0.066012,0.017792,-0.002191'/>
+            <ToLocation value='-0.027912,0.017792,-0.002184'/>
+            <MaxDiameter value='0.000000'/>
+            <Diameter value='0.002000'/>
+            <Comment value='No Comments'/>
+            <Coverings value=''/>
+        </properties>
+    </segment>
+</segmentData>

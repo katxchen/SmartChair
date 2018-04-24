@@ -1,0 +1,117 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<fromToList xmlns='http://www.solidworks.com/fromToList'>
+    <version value='3'/>
+ fromToRouteType='route'    <fromToData>
+        <wireID value='1'/>
+        <wireName value='20g white_1'/>
+        <signalName  value=''/>
+        <cableID value='0'/>
+        <cableName value=''/>
+        <cableCoreRef value=''/>
+        <colour value='W'/>
+        <swColour value='16777215'/>
+        <partNumber value='9983'/>
+        <OD value='0.002000'/>
+        <conductorDiameter value='0.000000'/>
+        <size value='2'/>
+        <routedLength value='0.244179'/>
+        <cuttingLength value='0.244179'/>
+        <comments value='20g white'/>
+        <fromCompID value='-1'/>
+        <fromCompRef value=''/>
+        <fromPinID value='-1'/>
+        <fromPinRef value=''/>
+        <fromInsert value=''/>
+        <fromCompPart value=''/>
+        <twistID value='0'/>
+        <twistNumberPerLength value='0.000000'/>
+        <twistPerMetreLength value='0.000000'/>
+        <unitForTwistPerUnitLength value='0'/>
+        <twistedLength value='0.244179'/>
+        <twistedPairName value=''/>
+        <fromPinIsTBlock value='0'/>
+        <toCompID value='-1'/>
+        <toCompRef value=''/>
+        <toPinID value='-1'/>
+        <toPinRef value=''/>
+        <toCompPart value=''/>
+        <toInsert value=''/>
+        <owner value='1'/>
+        <minBendRadius value='0.001000'/>
+        <toPinIsTBlock value='0'/>
+    </fromToData>
+    <FromTerminal>
+        <Terminal>
+            <TerminalID value=''/>
+            <TerminalName value=''/>
+            <GaugeRange value=''/>
+            <Description value=''/>
+            <PartNumber value=''/>
+            <Vendor value=''/>
+        </Terminal>
+    </FromTerminal>
+    <ToTerminal>
+        <Terminal>
+            <TerminalID value=''/>
+            <TerminalName value=''/>
+            <GaugeRange value=''/>
+            <Description value=''/>
+            <PartNumber value=''/>
+            <Vendor value=''/>
+        </Terminal>
+    </ToTerminal>
+    <FromSeal>
+        <Seal>
+            <SealID value=''/>
+            <SealName value=''/>
+            <Vendor value=''/>
+            <Description value=''/>
+            <PartNumber value=''/>
+        </Seal>
+    </FromSeal>
+    <ToSeal>
+        <Seal>
+            <SealID value=''/>
+            <SealName value=''/>
+            <Vendor value=''/>
+            <Description value=''/>
+            <PartNumber value=''/>
+        </Seal>
+    </ToSeal>
+    <FromPlug>
+        <Plug>
+            <PlugID value=''/>
+            <PlugName value=''/>
+            <PartNumber value=''/>
+            <Description value=''/>
+            <Vendor value=''/>
+        </Plug>
+    </FromPlug>
+    <ToPlug>
+        <Plug>
+            <PlugID value=''/>
+            <PlugName value=''/>
+            <PartNumber value=''/>
+            <Description value=''/>
+            <Vendor value=''/>
+        </Plug>
+    </ToPlug>
+    <FromMisc>
+        <Misc>
+            <MiscID value=''/>
+            <MiscName value=''/>
+            <Description value=''/>
+            <PartNumber value=''/>
+            <Vendor value=''/>
+        </Misc>
+    </FromMisc>
+    <ToMisc>
+        <Misc>
+            <MiscID value=''/>
+            <MiscName value=''/>
+            <Description value=''/>
+            <PartNumber value=''/>
+            <Vendor value=''/>
+        </Misc>
+    </ToMisc>
+</fromToList>
